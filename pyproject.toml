@@ -1,0 +1,52 @@
+[project]
+name = "github-issue-classifier"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11.9"
+dependencies = [
+    "fastapi>=0.128.0",
+    "mlflow>=3.8.1",
+    "numpy>=2.4.1",
+    "pandas>=2.3.3",
+    "plotly>=6.5.1",
+    "pydantic-settings>=2.12.0",
+    "pymongo>=4.16.0",
+    "python-multipart>=0.0.21",
+    "requests>=2.32.5",
+    "scikit-learn>=1.8.0",
+    "torch>=2.9.1",
+    "torchaudio>=2.9.1",
+    "torchvision>=0.24.1",
+    "uvicorn>=0.40.0",
+]
+
+[dependency-groups]
+dev = [
+    "commitizen>=4.11.3",
+    "httpx>=0.28.1",
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.11",
+]
+
+# --- Configuration Commitizen ---
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "semver"
+version_provider = "pep621"
+update_changelog_on_bump = true
+
+# --- Configuration Ruff (Linter & Formatter ultra-rapide) ---
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"] # E: Errors, F: Pyflakes, I: Isort (gestion des imports)
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

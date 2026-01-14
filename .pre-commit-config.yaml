@@ -1,0 +1,42 @@
+# .pre-commit-config.yaml
+repos:
+  # 1. Nettoyage de base (Espaces, fichiers vides, gros fichiers)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=10000'] # Bloque les fichiers > 10Mo (modèles, datasets)
+      - id: check-ast # Vérifie si le code Python est syntaxiquement correct
+      - id: pretty-format-json
+
+  # 2. La rolls du linting et formatage (remplace Black, Flake8, Isort)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: [ --fix, --exit-non-zero-on-fix ]
+      - id: ruff-format
+
+  # 3. Spécifique MLOps : Nettoyage des Jupyter Notebooks
+  # Enlève les outputs et les métadonnées pour éviter des diffs Git illisibles
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.6.1
+    hooks:
+      - id: nbstripout
+
+  # 4. Sécurité : Détection de secrets (Clés API, mots de passe de DB)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        exclude: .*/tests/.* # On ignore souvent les tests si on utilise des faux secrets
+
+  # 5. Typage statique (Optionnel mais recommandé pour les pipelines complexes)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests, types-PyYAML]
