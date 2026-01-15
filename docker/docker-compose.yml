@@ -7,21 +7,10 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    command: ["mongod", "--bind_ip_all"]
-    healthcheck:
-      test:
-        - CMD
-        - mongosh
-        - "mongodb://localhost:27017/admin"
-        - "--eval=db.runCommand({ping:1})"
-      retries: 3
-      timeout: 5s
+      MONGO_INITDB_DATABASE: github_issues_db
+    # command: ["mongod", "--bind_ip_all"]
     volumes:
       - mongo_data:/data/db
-    networks:
-      - mongodb_network
 
   # Interface Web pour MongoDB
   mongo-express:
@@ -31,16 +20,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_ADMIN_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_ADMIN_PASSWORD}
+      ME_CONFIG_BASICAUTH_ENABLED: true
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
     depends_on:
       - mongo
-    networks:
-      - mongodb_network
 
-  # Serveur MLflow
+  # Serveur MLflow (Reste inchangé)
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.9.2
     container_name: mlflow_server
@@ -58,7 +45,3 @@ services:
 volumes:
   mongo_data:
   mlflow_data:
-
-networks:
-  mongodb_network:
-    driver: bridge
