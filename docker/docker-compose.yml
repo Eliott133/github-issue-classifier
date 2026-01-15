@@ -1,0 +1,64 @@
+services:
+  # Base de données NoSQL
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    command: ["mongod", "--bind_ip_all"]
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - "mongodb://localhost:27017/admin"
+        - "--eval=db.runCommand({ping:1})"
+      retries: 3
+      timeout: 5s
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mongodb_network
+
+  # Interface Web pour MongoDB
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_ADMIN_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_ADMIN_PASSWORD}
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    depends_on:
+      - mongo
+    networks:
+      - mongodb_network
+
+  # Serveur MLflow
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.9.2
+    container_name: mlflow_server
+    restart: always
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:///mlflow.db
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+    volumes:
+      - mlflow_data:/mlflow
+
+volumes:
+  mongo_data:
+  mlflow_data:
+
+networks:
+  mongodb_network:
+    driver: bridge
