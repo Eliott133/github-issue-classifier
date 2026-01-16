@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # GitHub Configuration
     GITHUB_TOKEN: SecretStr
-    GITHUB_REPOSITORY: str = "fastapi/fastapi"  # Valeur par défaut si non spécifié
+    GITHUB_REPOSITORY: str = "fastapi/fastapi"
 
     # Database Configuration
     MONGO_URI: str = "mongodb://localhost:27017"
