@@ -1,28 +1,27 @@
-from pydantic import SecretStr
+from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # GitHub Configuration
-    GITHUB_TOKEN: SecretStr
-    GITHUB_REPOSITORY: str = "fastapi/fastapi"
+    GITHUB_TOKENS: str
+    TARGET_REPOS: str = "fastapi/fastapi"
 
-    # Database Configuration
-    MONGO_URI: str = "mongodb://localhost:27017"
-    MONGO_DB_NAME: str = "github_data"
+    MONGO_URI: str
+    MONGO_DB_NAME: str = "github_issues_db"
 
-    # MLflow Configuration
     MLFLOW_TRACKING_URI: str = "http://localhost:5000"
-    MLFLOW_EXPERIMENT_NAME: str = "default_experiment"
+    MLFLOW_EXPERIMENT_NAME: str = "github_issue_classifier"
 
-    # Configuration Pydantic
-    # Lit automatiquement le fichier .env
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",  # Ignore les variables inutiles du .env
-    )
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @property
+    def tokens_list(self) -> List[str]:
+        return [t.strip() for t in self.GITHUB_TOKENS.split(",") if t.strip()]
+
+    @property
+    def repos_list(self) -> List[str]:
+        return [r.strip() for r in self.TARGET_REPOS.split(",") if r.strip()]
 
 
-# On instancie la config une seule fois pour l'importer partout
 settings = Settings()
