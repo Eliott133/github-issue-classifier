@@ -1,32 +1,4 @@
 services:
-  # Base de données NoSQL
-  mongo:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: github_issues_db
-    # command: ["mongod", "--bind_ip_all"]
-    volumes:
-      - mongo_data:/data/db
-
-  # Interface Web pour MongoDB
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_BASICAUTH_ENABLED: true
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_PORT: 27017
-    depends_on:
-      - mongo
-
   # Serveur MLflow (Reste inchangé)
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.9.2
@@ -43,5 +15,4 @@ services:
       - mlflow_data:/mlflow
 
 volumes:
-  mongo_data:
   mlflow_data:
