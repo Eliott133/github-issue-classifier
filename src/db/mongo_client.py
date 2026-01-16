@@ -24,5 +24,12 @@ class MongoDBClient:
             logger.error(f"Erreur MongoDB inattendue: {e}")
             raise
 
+    def get_collection(self, collection_name: str):
+        """Récupère une collection spécifique."""
+        return self.db[collection_name]
+
+    def close(self):
+        self.client.close()
+
 
 mongo_client = MongoDBClient()
