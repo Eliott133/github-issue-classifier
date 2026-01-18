@@ -1,0 +1,29 @@
+# Utilisation d'une image Python légère
+FROM python:3.11.9-slim
+
+# Installation de uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.24 /uv /bin/uv
+
+# Définition du dossier de travail
+WORKDIR /app
+
+# Copie des fichiers de dépendances
+COPY pyproject.toml uv.lock ./
+
+# Installation des dépendances dans l'environnement système du conteneur
+# On utilise --system pour ne pas créer de venv à l'intérieur du Docker (inutile ici)
+RUN uv sync --frozen
+
+# Copie du code source
+COPY src/ src/
+COPY .env .env
+
+# Variable d'environnement pour que Python trouve le package 'src'
+ENV PYTHONPATH=/app
+
+# Exposition du port Streamlit
+EXPOSE 8501
+
+# Commande de lancement
+# On ajoute --server.address 0.0.0.0 pour qu'il soit accessible depuis l'extérieur du conteneur
+CMD ["uv", "run", "streamlit", "run", "src/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

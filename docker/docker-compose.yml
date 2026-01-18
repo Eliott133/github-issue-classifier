@@ -1,5 +1,4 @@
 services:
-  # Serveur MLflow (Reste inchangé)
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.9.2
     container_name: mlflow_server
@@ -13,6 +12,20 @@ services:
       --host 0.0.0.0
     volumes:
       - mlflow_data:/mlflow
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: monitoring_dashboard
+    restart: always
+    ports:
+      - "8501:8501"
+    env_file:
+      - ../.env
+    volumes:
+      - ../src:/app/src
+    depends_on:
+      - mlflow
 
 volumes:
   mlflow_data:
